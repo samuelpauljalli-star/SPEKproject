@@ -1,0 +1,24 @@
+{
+  "name": "wilson-health-care",
+  "version": "1.0.0",
+  "description": "Wilson Health Care Web App",
+  "main": "index.js",
+  "scripts": {
+    "build": "webpack --config webpack.config.cjs",
+    "bundle": "rollup -c",
+    "start": "webpack serve --open"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "firebase": "^10.7.1"
+  },
+  "devDependencies": {
+    "rollup": "^4.9.1",
+    "webpack": "^5.89.0",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^4.15.1"
+  },
+  "type": "module"
+}

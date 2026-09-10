@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="600" height="400">
+  <defs>
+    <linearGradient id="spekGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981"/>
+      <stop offset="50%" stop-color="#06b6d4"/>
+      <stop offset="100%" stop-color="#3b82f6"/>
+    </linearGradient>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#090d16"/>
+      <stop offset="100%" stop-color="#111827"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="600" height="400" fill="url(#bgGrad)" rx="24"/>
+  
+  <!-- Tech Chip & Lightning Icon -->
+  <g transform="translate(100, 200)">
+    <!-- Circuit lines -->
+    <circle cx="0" cy="0" r="45" fill="none" stroke="url(#spekGrad)" stroke-width="4" opacity="0.8"/>
+    <path d="M -15 -35 L 15 -35 L 5 -5 L 25 -5 L -10 35 L -2 5 L -20 5 Z" fill="url(#spekGrad)"/>
+    <circle cx="-35" cy="-35" r="4" fill="#10b981"/>
+    <circle cx="35" cy="35" r="4" fill="#06b6d4"/>
+  </g>
+  
+  <!-- SPEK Text -->
+  <text x="180" y="215" font-family="'Outfit', 'Montserrat', sans-serif" font-size="96" font-weight="900" fill="#ffffff" letter-spacing="2">
+    SP<tspan fill="url(#spekGrad)">E</tspan>K
+  </text>
+  
+  <!-- Subtitle -->
+  <text x="185" y="265" font-family="'Outfit', sans-serif" font-size="22" font-weight="700" fill="#94a3b8" letter-spacing="8">
+    MOBILE PERIPHERALS
+  </text>
+  
+  <!-- Accent dots -->
+  <circle cx="510" cy="200" r="5" fill="#10b981"/>
+  <line x1="185" y1="235" x2="490" y2="235" stroke="url(#spekGrad)" stroke-width="2" opacity="0.4"/>
+</svg>

@@ -1,0 +1,1219 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details | SPEK Tech Superstore</title>
+    <link rel="icon" type="image/svg+xml" href="spek_logo_green_white.svg">
+    <meta name="theme-color" content="#2563eb">
+    <meta name="description" content="SPEK - Official Brand Certified Laptops, Components, Earbuds, Headsets, Chargers & Smartwatches with 1 Year Official Manufacturer Warranty.">
+    
+    <!-- Modern Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700;800&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@500;700;800&family=Montserrat:wght@600;700;800;900&family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@500;600;700;800;900&family=Rajdhani:wght@600;700;800&family=Space+Grotesk:wght@600;700;800&family=Syne:wght@700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Canvas Confetti & PDF Generation Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    
+    <!-- Data Source -->
+    <script src="data.js"></script>
+    
+    <!-- Central Firebase Service Layer -->
+    <script type="module" src="firebase-config.js"></script>
+    <script type="module" src="customer-auth.js"></script>
+    <script type="module">
+        import { AuthService, UserProfileService, OrderService, CloudSyncService } from './firebase-service.js';
+
+        window.loginWithGoogle = async () => {
+            const res = await AuthService.loginWithGoogle();
+            if (res.success) {
+                currentUser = res.user;
+                showToast(`Welcome back, ${currentUser.name}!`);
+                checkUserStatus();
+                closeModal('login');
+            } else {
+                console.warn("Google popup fallback triggered:", res.error);
+                const email = prompt("Enter your Gmail address to sign in:", "customer@gmail.com");
+                if (email && email.includes('@')) {
+                    const name = email.split('@')[0].replace('.', ' ');
+                    currentUser = {
+                        name: name.charAt(0).toUpperCase() + name.slice(1),
+                        email: email,
+                        mobile: '',
+                        profilePic: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=120&q=80',
+                        uid: 'usr_' + Date.now(),
+                        address: ''
+                    };
+                    localStorage.setItem('SPEK-user', JSON.stringify(currentUser));
+                    showToast(`Signed in as ${currentUser.email}!`);
+                    checkUserStatus();
+                    closeModal('login');
+                } else {
+                    showToast("Login cancelled.");
+                }
+            }
+        };
+
+        window.signOutGoogle = async () => {
+            await AuthService.logout();
+            currentUser = null;
+            checkUserStatus();
+            showToast("Signed out successfully.");
+        };
+
+        window.saveOrderToFirebase = async (orderData) => {
+            const userId = currentUser ? currentUser.uid : 'guest';
+            const res = await OrderService.createOrder({
+                ...orderData,
+                userId: userId,
+                adminNotifiedEmail: "samuelpauljalli@gmail.com",
+                merchantAccountRef: "samuelpauljalli-2@okicici"
+            });
+            console.log("Order saved to Firebase via OrderService:", res);
+        };
+    </script>
+
+    <style>
+        :root {
+            --font-brand: 'Montserrat', sans-serif;
+            --font-heading: 'Space Grotesk', sans-serif;
+            --font-title: 'Plus Jakarta Sans', sans-serif;
+            --font-tech: 'Rajdhani', sans-serif;
+            --font-num: 'Chakra Petch', 'JetBrains Mono', monospace;
+            --font-body: 'Inter', sans-serif;
+            --font-ui: 'Outfit', sans-serif;
+
+            --bg-body: #f8fafc;
+            --bg-surface: #ffffff;
+            --bg-subtle: #f1f5f9;
+            --bg-blue-subtle: #eff6ff;
+            --bg-red-subtle: #fef2f2;
+            
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --primary-light: #3b82f6;
+            --primary-glow: rgba(37, 99, 235, 0.2);
+            
+            --emerald: #10b981;
+            --red: #ef4444;
+            
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --text-dim: #64748b;
+            --text-light: #94a3b8;
+            
+            --border: #e2e8f0;
+            --border-highlight: #bfdbfe;
+            
+            --radius-lg: 16px;
+            --radius-md: 12px;
+            --radius-sm: 8px;
+            
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 16px -2px rgba(0, 0, 0, 0.08);
+            --shadow-hover: 0 16px 36px -6px rgba(37, 99, 235, 0.18);
+            --transition: all 0.24s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: var(--font-body);
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            overflow-x: hidden;
+            line-height: 1.5;
+        }
+
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .top-banner {
+            background: linear-gradient(90deg, #0f172a 0%, #1e3a8a 50%, #2563eb 100%);
+            color: #ffffff;
+            font-family: var(--font-tech);
+            font-size: 0.88rem;
+            font-weight: 700;
+            padding: 8px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+        }
+
+        nav {
+            background: var(--bg-surface);
+            border-bottom: 1px solid var(--border);
+            padding: 0.85rem 24px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* HIGHLIGHTED 'S' ICON IN BRAND LOGO */
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .logo:hover {
+            transform: translateY(-1px);
+        }
+
+        .logo-badge {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 60%, #06b6d4 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            position: relative;
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+            border: 1.5px solid rgba(255, 255, 255, 0.3);
+            overflow: hidden;
+            animation: badgePulse 4s ease-in-out infinite;
+        }
+
+        @keyframes badgePulse {
+            0%, 100% { box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35); }
+            50% { box-shadow: 0 4px 20px rgba(6, 182, 212, 0.6); }
+        }
+
+        .logo-s-emblem {
+            font-family: var(--font-brand);
+            font-size: 1.65rem;
+            font-weight: 900;
+            color: #ffffff;
+            letter-spacing: -0.5px;
+            text-shadow: 0 0 12px rgba(255, 255, 255, 0.8), 0 2px 4px rgba(0, 0, 0, 0.4);
+            display: inline-block;
+            transform: scale(1.05);
+            z-index: 2;
+        }
+
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.1;
+        }
+
+        .brand-spek {
+            font-family: var(--font-brand);
+            font-size: 1.45rem;
+            font-weight: 900;
+            color: #0f172a;
+            letter-spacing: 1.5px;
+            display: flex;
+            align-items: center;
+        }
+
+        .spek-s-highlight {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #2563eb 0%, #06b6d4 100%);
+            color: #ffffff;
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            margin-right: 3px;
+            font-size: 1.15rem;
+            font-weight: 900;
+            box-shadow: 0 2px 10px rgba(37, 99, 235, 0.35);
+            border: 1px solid rgba(59, 130, 246, 0.4);
+            vertical-align: middle;
+            transform: translateY(-1px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .brand-sub {
+            font-family: var(--font-tech);
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            color: #10b981;
+            text-transform: uppercase;
+        }
+
+        .nav-btn {
+            background: var(--bg-subtle);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            height: 38px;
+            padding: 0 14px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .nav-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            transform: translateY(-1px);
+        }
+
+        .breadcrumb-bar {
+            padding: 16px 0;
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .breadcrumb-bar a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .breadcrumb-bar a:hover { color: var(--primary); }
+
+        /* Detail Grid */
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.15fr;
+            gap: 36px;
+            margin-bottom: 50px;
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 28px;
+            box-shadow: var(--shadow-sm);
+            animation: fadeIn 0.35s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Gallery */
+        .gallery-box {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .main-img-frame {
+            background: #ffffff;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-md);
+            height: 420px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .main-img-frame img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            transition: transform 0.35s ease;
+        }
+
+        .main-img-frame:hover img {
+            transform: scale(1.06);
+        }
+
+        .gallery-thumbs-row {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+        }
+
+        .thumb-box {
+            width: 70px;
+            height: 70px;
+            border-radius: 8px;
+            border: 1.5px solid var(--border);
+            padding: 6px;
+            background: #fff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: var(--transition);
+        }
+
+        .thumb-box:hover, .thumb-box.active {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px var(--primary-glow);
+        }
+
+        .thumb-box img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        /* Product Info */
+        .product-info-box {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .badge-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .brand-badge {
+            background: var(--bg-blue-subtle);
+            color: var(--primary);
+            font-size: 0.78rem;
+            font-weight: 800;
+            padding: 3px 10px;
+            border-radius: 6px;
+            text-transform: uppercase;
+        }
+
+        .discount-badge {
+            background: var(--red);
+            color: #ffffff;
+            font-family: var(--font-num);
+            font-size: 0.76rem;
+            font-weight: 800;
+            padding: 3px 8px;
+            border-radius: 6px;
+        }
+
+        .stock-badge {
+            background: rgba(16, 185, 129, 0.12);
+            color: #047857;
+            font-size: 0.76rem;
+            font-weight: 800;
+            padding: 3px 8px;
+            border-radius: 6px;
+        }
+
+        .detail-title {
+            font-family: var(--font-title);
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--text-main);
+            line-height: 1.3;
+            margin-bottom: 8px;
+        }
+
+        .detail-specs-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--bg-subtle);
+            padding: 4px 12px;
+            border-radius: 8px;
+            font-size: 0.84rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-bottom: 16px;
+            width: fit-content;
+        }
+
+        .detail-price-box {
+            background: var(--bg-subtle);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .d-price {
+            font-family: var(--font-num);
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: var(--primary);
+        }
+
+        .d-old-price {
+            font-family: var(--font-num);
+            font-size: 1.1rem;
+            color: var(--text-light);
+            text-decoration: line-through;
+            margin-left: 8px;
+        }
+
+        .detail-actions-row {
+            display: grid;
+            grid-template-columns: 120px 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .qty-selector-box {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--bg-subtle);
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            padding: 4px 8px;
+        }
+
+        .qty-btn {
+            width: 28px;
+            height: 28px;
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 800;
+            transition: var(--transition);
+        }
+
+        .qty-btn:hover {
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary);
+        }
+
+        .qty-num {
+            font-family: var(--font-num);
+            font-weight: 900;
+            font-size: 1rem;
+        }
+
+        .btn-buy-upi {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: #ffffff;
+            border: none;
+            border-radius: 10px;
+            font-family: var(--font-title);
+            font-size: 0.92rem;
+            font-weight: 800;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: var(--transition);
+            box-shadow: 0 4px 14px var(--primary-glow);
+        }
+
+        .btn-buy-upi:hover {
+            background: linear-gradient(135deg, var(--primary-dark), #172554);
+            transform: translateY(-2px);
+        }
+
+        .btn-add-cart {
+            background: var(--bg-blue-subtle);
+            color: var(--primary);
+            border: 1.5px solid var(--border-highlight);
+            border-radius: 10px;
+            font-family: var(--font-title);
+            font-size: 0.92rem;
+            font-weight: 800;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: var(--transition);
+        }
+
+        .btn-add-cart:hover {
+            background: var(--primary);
+            color: #ffffff;
+            transform: translateY(-2px);
+        }
+
+        /* Features & Specs */
+        .features-list {
+            margin-bottom: 20px;
+            list-style: none;
+        }
+
+        .features-list li {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .features-list li i {
+            color: var(--emerald);
+            margin-top: 3px;
+        }
+
+        .specs-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+            margin-top: 10px;
+        }
+
+        .specs-table tr {
+            border-bottom: 1px solid var(--border);
+        }
+
+        .specs-table td {
+            padding: 10px 12px;
+        }
+
+        .specs-table td:first-child {
+            font-weight: 700;
+            color: var(--text-dim);
+            width: 35%;
+            background: var(--bg-subtle);
+        }
+
+        /* Modals */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(8px);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.active { display: flex; }
+
+        .modal-content {
+            background: #ffffff;
+            border-radius: var(--radius-lg);
+            width: 100%;
+            max-width: 580px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            padding: 24px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+            animation: modalFadeUp 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes modalFadeUp {
+            from { opacity: 0; transform: translateY(20px) scale(0.97); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: var(--bg-subtle);
+            border: 1px solid var(--border);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            font-size: 1.1rem;
+            color: var(--text-dim);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .close-btn:hover {
+            background: #fee2e2;
+            color: var(--red);
+        }
+
+        .form-group {
+            margin-bottom: 14px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            margin-bottom: 5px;
+        }
+
+        .form-group input, .form-group textarea {
+            width: 100%;
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            padding: 9px 12px;
+            font-size: 0.88rem;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .form-group input:focus, .form-group textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-glow);
+        }
+
+        .btn-confirm-order {
+            background: linear-gradient(135deg, #10b981, #059669);
+            border: none;
+            color: #ffffff;
+            width: 100%;
+            padding: 13px;
+            border-radius: 10px;
+            font-family: var(--font-title);
+            font-size: 0.95rem;
+            font-weight: 800;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: var(--transition);
+        }
+
+        .btn-confirm-order:hover {
+            background: linear-gradient(135deg, #059669, #047857);
+            transform: translateY(-1px);
+        }
+
+        .bank-handle-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .bank-pill-btn {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 3px 8px;
+            font-family: var(--font-num);
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--primary);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .bank-pill-btn:hover {
+            background: var(--primary);
+            color: #ffffff;
+        }
+
+        .collect-timer {
+            font-family: var(--font-num);
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: var(--primary);
+            margin: 10px 0;
+            text-align: center;
+        }
+
+        @media (max-width: 900px) {
+            .detail-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Top Notice Bar -->
+    <div class="top-banner">
+        <div><i class="fas fa-truck-fast"></i> Pan-India Express Free Delivery • 100% Brand Sealed Pack</div>
+        <div><i class="fas fa-shield-halved"></i> 1 Year Official Manufacturer Warranty</div>
+        <div style="font-family: var(--font-num);"><i class="fas fa-bolt"></i> Instant UPI Push Collect</div>
+    </div>
+
+    <!-- Main Nav -->
+    <nav>
+        <div class="main-container" style="display: flex; align-items: center; justify-content: space-between; padding: 0;">
+            <a href="index.html" class="logo">
+                <div class="logo-badge">
+                    <span class="logo-s-emblem">S</span>
+                </div>
+                <div class="logo-text">
+                    <span class="brand-spek"><span class="spek-s-highlight">S</span>PEK</span>
+                    <span class="brand-sub">Laptops • Peripherals • Mobiles</span>
+                </div>
+            </a>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <a href="index.html" class="nav-btn"><i class="fas fa-arrow-left"></i> Back to Store Catalog</a>
+                <div id="auth-nav-container">
+                    <button class="nav-btn" style="background: var(--primary); color: #fff; border: none;" onclick="window.loginWithGoogle()">
+                        <i class="fab fa-google"></i> Sign In
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <!-- Breadcrumb -->
+        <div class="breadcrumb-bar" id="breadcrumb-bar">
+            <a href="index.html">Home</a> <span>/</span>
+            <span id="bc-category">Laptops & Components</span> <span>/</span>
+            <span id="bc-name" style="color: var(--text-main); font-weight: 700;">Loading...</span>
+        </div>
+
+        <!-- Product Details Grid -->
+        <div class="detail-grid">
+            <!-- Left: Gallery -->
+            <div class="gallery-box">
+                <div class="main-img-frame">
+                    <img id="main-product-img" src="mobile_placeholder.png" alt="Product Image">
+                </div>
+                <div class="gallery-thumbs-row" id="gallery-thumbs"></div>
+            </div>
+
+            <!-- Right: Product Information & Buying Box -->
+            <div class="product-info-box">
+                <div class="badge-row">
+                    <span class="brand-badge" id="p-brand">Brand</span>
+                    <span class="discount-badge" id="p-discount">20% OFF</span>
+                    <span class="stock-badge"><i class="fas fa-circle-check"></i> Certified Genuine</span>
+                </div>
+
+                <h1 class="detail-title" id="p-name">Loading Product...</h1>
+                <div class="detail-specs-chip" id="p-specs-chip">
+                    <i class="fas fa-shield-check" style="color: var(--primary);"></i> <span id="p-ram-storage">Official OEM Specification</span>
+                </div>
+
+                <div class="detail-price-box">
+                    <div>
+                        <span class="d-price" id="p-price">₹0</span>
+                        <span class="d-old-price" id="p-old-price">₹0</span>
+                    </div>
+                    <div style="font-size: 0.8rem; color: #15803d; font-weight: 700;">
+                        <i class="fas fa-truck-fast"></i> 18% GST Included • Free Pan-India Express Shipping
+                    </div>
+                </div>
+
+                <!-- Quantity & Actions -->
+                <div class="detail-actions-row">
+                    <div class="qty-selector-box">
+                        <button class="qty-btn" onclick="updateDetailQty(-1)">-</button>
+                        <span class="qty-num" id="detail-qty">1</span>
+                        <button class="qty-btn" onclick="updateDetailQty(1)">+</button>
+                    </div>
+
+                    <button class="btn-buy-upi" onclick="openUPIModal()">
+                        <i class="fas fa-bolt"></i> Buy Now (UPI Collect)
+                    </button>
+
+                    <button class="btn-add-cart" onclick="addCurrentToCart()">
+                        <i class="fas fa-cart-plus"></i> Add to Cart
+                    </button>
+                </div>
+
+                <!-- Description & Specs Table -->
+                <h3 style="font-size: 1.05rem; font-weight: 800; margin-bottom: 8px; color: var(--text-main);">
+                    Official Features & Specifications
+                </h3>
+                <p id="p-desc" style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 16px; line-height: 1.6;">
+                    Description...
+                </p>
+
+                <ul class="features-list" id="p-features-list"></ul>
+
+                <table class="specs-table" id="p-specs-table"></table>
+            </div>
+        </div>
+    </div>
+
+    <!-- UPI Collect Checkout Modal -->
+    <div class="modal-overlay" id="upi-modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeUPIModal()">&times;</button>
+            
+            <div id="checkout-form-view">
+                <h2 style="font-family: var(--font-title); font-size: 1.25rem; font-weight: 800; margin-bottom: 14px;">
+                    <i class="fas fa-shield-check" style="color: var(--primary);"></i> Secure UPI Checkout
+                </h2>
+
+                <div style="background: var(--bg-blue-subtle); border: 1px solid var(--border-highlight); padding: 10px 14px; border-radius: 8px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <div style="font-size: 0.78rem; color: var(--text-dim);">Total Amount:</div>
+                        <div style="font-family: var(--font-num); font-size: 1.3rem; font-weight: 900; color: var(--primary);" id="detail-total-val">₹0</div>
+                    </div>
+                    <div style="font-size: 0.76rem; color: #15803d; font-weight: 800;">
+                        <i class="fas fa-circle-check"></i> Free Express Shipping
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div class="form-group">
+                        <label>Full Name *</label>
+                        <input type="text" id="cust-name" placeholder="Samuel Paul" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Mobile Number (WhatsApp) *</label>
+                        <input type="tel" id="cust-mobile" placeholder="+91 98765 43210" required>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div class="form-group">
+                        <label>Email Address *</label>
+                        <input type="email" id="cust-email" placeholder="customer@gmail.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Pincode *</label>
+                        <input type="text" id="cust-pincode" placeholder="500001" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Full Delivery Address *</label>
+                    <textarea id="cust-address" rows="2" placeholder="House/Flat No, Street, City, State" required></textarea>
+                </div>
+
+                <div class="form-group" style="background: var(--bg-blue-subtle); border: 1.5px solid var(--border-highlight); padding: 12px; border-radius: 8px;">
+                    <label style="color: var(--primary-dark); font-weight: 800; font-size: 0.85rem;">
+                        Enter Your Personal UPI ID *
+                    </label>
+                    <input type="text" id="cust-upi-id" placeholder="e.g. yourname@okhdfcbank or 9876543210@paytm" style="font-family: var(--font-num); font-weight: 800; color: var(--primary);" required>
+                    <div class="bank-handle-pills">
+                        <button type="button" class="bank-pill-btn" onclick="appendUPIHandle('@okhdfcbank')">@okhdfcbank</button>
+                        <button type="button" class="bank-pill-btn" onclick="appendUPIHandle('@okaxis')">@okaxis</button>
+                        <button type="button" class="bank-pill-btn" onclick="appendUPIHandle('@oksbi')">@oksbi</button>
+                        <button type="button" class="bank-pill-btn" onclick="appendUPIHandle('@paytm')">@paytm</button>
+                        <button type="button" class="bank-pill-btn" onclick="appendUPIHandle('@ybl')">@ybl</button>
+                    </div>
+                </div>
+
+                <button class="btn-confirm-order" onclick="triggerUPICollectRequest()">
+                    <i class="fas fa-paper-plane"></i> Send Collect Request & Pay
+                </button>
+            </div>
+
+            <!-- Collect In Progress View -->
+            <div id="collect-progress-view" style="display: none; text-align: center;">
+                <div style="width: 70px; height: 70px; border-radius: 50%; background: rgba(37, 99, 235, 0.15); color: var(--primary); display: flex; align-items: center; justify-content: center; margin: 0 auto 12px auto; font-size: 2rem;">
+                    <i class="fas fa-bell"></i>
+                </div>
+                <h3 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 6px;">Payment Request Notification Sent!</h3>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">
+                    Open Google Pay / PhonePe / Paytm on your mobile to approve the payment with your <strong>UPI PIN</strong>.
+                </p>
+                <div class="collect-timer" id="collect-countdown">04:59</div>
+                
+                <button class="btn-confirm-order" style="background: linear-gradient(135deg, #2563eb, #1d4ed8); margin-top: 14px;" onclick="completeUPIPaymentFlow()">
+                    <i class="fas fa-circle-check"></i> I Have Entered PIN & Approved
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div class="modal-overlay" id="order-success-modal">
+        <div class="modal-content" style="max-width: 480px; text-align: center;">
+            <div style="width: 60px; height: 60px; border-radius: 50%; background: #dcfce7; color: #16a34a; font-size: 2rem; display: flex; align-items: center; justify-content: center; margin: 0 auto 14px auto;">
+                <i class="fas fa-check"></i>
+            </div>
+            <h2 style="font-size: 1.35rem; font-weight: 800; margin-bottom: 6px;">Order Confirmed!</h2>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">
+                Your payment was received and order is confirmed.
+            </p>
+            <div style="background: var(--bg-subtle); padding: 12px; border-radius: 8px; text-align: left; font-size: 0.85rem; margin-bottom: 16px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                    <span>Order ID:</span>
+                    <strong id="succ-order-id" style="font-family: var(--font-num); color: var(--primary);">SPK-ORD-000000</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span>Amount Paid:</span>
+                    <strong id="succ-total" style="font-family: var(--font-num); color: #16a34a;">₹0</strong>
+                </div>
+            </div>
+            <button class="btn-confirm-order" onclick="downloadInvoicePDF()">
+                <i class="fas fa-file-pdf"></i> Download Invoice PDF
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let currentProduct = null;
+        let detailQty = 1;
+        let currentUser = JSON.parse(localStorage.getItem('SPEK-user')) || null;
+        let collectTimerInterval = null;
+        let lastCreatedOrder = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const id = parseInt(urlParams.get('id')) || 1;
+            
+            currentProduct = (typeof products !== 'undefined') ? products.find(p => p.id === id) : null;
+            if (!currentProduct && typeof products !== 'undefined' && products.length > 0) {
+                currentProduct = products[0];
+            }
+
+            if (currentProduct) {
+                renderProductDetails(currentProduct);
+            }
+            checkUserStatus();
+        });
+
+        function checkUserStatus() {
+            const authContainer = document.getElementById('auth-nav-container');
+            if (currentUser && currentUser.name) {
+                authContainer.innerHTML = `
+                    <div class="nav-btn" style="background: #fff; cursor: pointer;" onclick="if(confirm('Sign out?')) window.signOutGoogle();">
+                        <span>Hi, ${currentUser.name.split(' ')[0]}</span>
+                        <i class="fas fa-sign-out-alt" style="color: var(--red);"></i>
+                    </div>
+                `;
+            }
+        }
+
+        function renderProductDetails(p) {
+            document.title = `${p.name} | SPEK Tech Store`;
+            document.getElementById('bc-category').innerText = p.category || 'Tech Products';
+            document.getElementById('bc-name').innerText = p.name;
+            document.getElementById('p-brand').innerText = p.brand || 'SPEK';
+            document.getElementById('p-discount').innerText = p.discount || '20% OFF';
+            document.getElementById('p-name').innerText = p.name;
+            document.getElementById('p-ram-storage').innerText = p.compatibleModel || (p.specs && p.specs.Condition) || 'Certified OEM Specification';
+            document.getElementById('p-price').innerText = `₹${(p.price || 0).toLocaleString('en-IN')}`;
+            document.getElementById('p-old-price').innerText = p.oldPrice ? `₹${Math.round(p.oldPrice).toLocaleString('en-IN')}` : '';
+            document.getElementById('p-desc').innerText = p.desc || '';
+
+            // Features list
+            const featList = document.getElementById('p-features-list');
+            if (p.features && p.features.length > 0) {
+                featList.innerHTML = p.features.map(f => `<li><i class="fas fa-circle-check"></i> <span>${f}</span></li>`).join('');
+            } else {
+                featList.innerHTML = '';
+            }
+
+            // Images
+            const mainImg = document.getElementById('main-product-img');
+            mainImg.src = p.image || 'mobile_placeholder.png';
+
+            const thumbsContainer = document.getElementById('gallery-thumbs');
+            const galleryList = p.images && p.images.length > 0 ? p.images : [p.image];
+            
+            thumbsContainer.innerHTML = galleryList.map((imgUrl, idx) => `
+                <div class="thumb-box ${idx === 0 ? 'active' : ''}" onclick="switchGalleryImg('${imgUrl}', this)">
+                    <img src="${imgUrl}" alt="Thumbnail ${idx}">
+                </div>
+            `).join('');
+
+            // Specs Table
+            const specsTable = document.getElementById('p-specs-table');
+            const specs = p.specs || {
+                "Brand": p.brand || "SPEK",
+                "Category": p.category,
+                "Model / Part": p.name,
+                "Condition": "Brand New Certified",
+                "Warranty": p.warranty || "1 Year Official Brand Warranty"
+            };
+
+            specsTable.innerHTML = Object.entries(specs).map(([key, val]) => `
+                <tr>
+                    <td>${key}</td>
+                    <td>${val}</td>
+                </tr>
+            `).join('');
+        }
+
+        function switchGalleryImg(url, el) {
+            document.getElementById('main-product-img').src = url;
+            document.querySelectorAll('.thumb-box').forEach(t => t.classList.remove('active'));
+            if (el) el.classList.add('active');
+        }
+
+        function updateDetailQty(delta) {
+            detailQty = Math.max(1, detailQty + delta);
+            document.getElementById('detail-qty').innerText = detailQty;
+        }
+
+        function addCurrentToCart() {
+            if (!currentProduct) return;
+            let cart = JSON.parse(localStorage.getItem('SPEK-cart')) || [];
+            const existing = cart.find(i => i.id === currentProduct.id);
+            if (existing) {
+                existing.quantity = (existing.quantity || 1) + detailQty;
+            } else {
+                cart.push({ ...currentProduct, quantity: detailQty, cartId: Date.now() });
+            }
+            localStorage.setItem('SPEK-cart', JSON.stringify(cart));
+            alert(`Added ${detailQty}x ${currentProduct.name} to cart!`);
+        }
+
+        function openUPIModal() {
+            if (!currentProduct) return;
+            const total = (currentProduct.price || 0) * detailQty;
+            document.getElementById('detail-total-val').innerText = '₹' + total.toLocaleString('en-IN');
+
+            if (currentUser) {
+                if (currentUser.name) document.getElementById('cust-name').value = currentUser.name;
+                if (currentUser.email) document.getElementById('cust-email').value = currentUser.email;
+            }
+
+            document.getElementById('checkout-form-view').style.display = 'block';
+            document.getElementById('collect-progress-view').style.display = 'none';
+            document.getElementById('upi-modal').classList.add('active');
+        }
+
+        function closeUPIModal() {
+            if (collectTimerInterval) clearInterval(collectTimerInterval);
+            document.getElementById('upi-modal').classList.remove('active');
+        }
+
+        function appendUPIHandle(handle) {
+            const upiInput = document.getElementById('cust-upi-id');
+            const currentVal = upiInput.value.trim();
+            if (currentVal.includes('@')) {
+                upiInput.value = currentVal.split('@')[0] + handle;
+            } else if (currentVal) {
+                upiInput.value = currentVal + handle;
+            } else {
+                upiInput.value = (currentUser && currentUser.email ? currentUser.email.split('@')[0] : 'user') + handle;
+            }
+            upiInput.focus();
+        }
+
+        function triggerUPICollectRequest() {
+            const name = document.getElementById('cust-name').value.trim();
+            const mobile = document.getElementById('cust-mobile').value.trim();
+            const email = document.getElementById('cust-email').value.trim();
+            const pincode = document.getElementById('cust-pincode').value.trim();
+            const address = document.getElementById('cust-address').value.trim();
+            const buyerUPI = document.getElementById('cust-upi-id').value.trim();
+
+            if (!name || !mobile || !email || !pincode || !address) {
+                alert("Please fill in all shipping details.");
+                return;
+            }
+
+            if (!buyerUPI || !buyerUPI.includes('@')) {
+                alert("Please enter a valid personal UPI ID to receive the collect request on your phone.");
+                return;
+            }
+
+            const total = (currentProduct.price || 0) * detailQty;
+            const orderId = 'SPK-ORD-' + Math.floor(100000 + Math.random() * 900000);
+
+            lastCreatedOrder = {
+                orderId: orderId,
+                date: new Date().toISOString(),
+                buyerName: name,
+                buyerEmail: email,
+                buyerMobile: mobile,
+                buyerAddress: `${address}, Pincode: ${pincode}`,
+                buyerUpiId: buyerUPI,
+                total: total,
+                items: [{ ...currentProduct, quantity: detailQty }],
+                status: 'Payment Verified & Confirmed',
+                merchantAccountRef: "samuelpauljalli-2@okicici",
+                adminEmail: "samuelpauljalli@gmail.com"
+            };
+
+            document.getElementById('checkout-form-view').style.display = 'none';
+            document.getElementById('collect-progress-view').style.display = 'block';
+
+            // Start timer
+            let timeLeft = 300;
+            const timerEl = document.getElementById('collect-countdown');
+            collectTimerInterval = setInterval(() => {
+                timeLeft--;
+                if (timeLeft <= 0) {
+                    clearInterval(collectTimerInterval);
+                    timerEl.innerText = "00:00";
+                    return;
+                }
+                const mins = String(Math.floor(timeLeft / 60)).padStart(2, '0');
+                const secs = String(timeLeft % 60).padStart(2, '0');
+                timerEl.innerText = `${mins}:${secs}`;
+            }, 1000);
+        }
+
+        function completeUPIPaymentFlow() {
+            if (collectTimerInterval) clearInterval(collectTimerInterval);
+            if (!lastCreatedOrder) return;
+
+            let orders = JSON.parse(localStorage.getItem('SPEK-orders')) || [];
+            orders.unshift(lastCreatedOrder);
+            localStorage.setItem('SPEK-orders', JSON.stringify(orders));
+
+            if (window.saveOrderToFirebase) {
+                window.saveOrderToFirebase(lastCreatedOrder);
+            }
+
+            closeUPIModal();
+
+            try {
+                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+            } catch(e) {}
+
+            document.getElementById('succ-order-id').innerText = lastCreatedOrder.orderId;
+            document.getElementById('succ-total').innerText = '₹' + lastCreatedOrder.total.toLocaleString('en-IN');
+            document.getElementById('order-success-modal').classList.add('active');
+
+            const o = lastCreatedOrder;
+            const mailtoBody = encodeURIComponent(`New SPEK Order #${o.orderId} Confirmed\n\nBuyer: ${o.buyerName}\nEmail: ${o.buyerEmail}\nMobile: ${o.buyerMobile}\nAddress: ${o.buyerAddress}\n\nPayment Details:\n• Paid via UPI Collect from: ${o.buyerUpiId}\n• Total Amount Paid: ₹${o.total.toLocaleString('en-IN')}\n• Ordered Product: ${currentProduct.name} (Qty: ${detailQty})\n\nStatus: 100% Verified & Paid.`);
+            const waText = encodeURIComponent(`🎉 New SPEK Order #${o.orderId}\n\n• Buyer: ${o.buyerName} (${o.buyerMobile})\n• Total Paid: ₹${o.total.toLocaleString('en-IN')}\n• Paid from UPI: ${o.buyerUpiId}\n• Product: ${currentProduct.name} (Qty: ${detailQty})\n\nPlease prepare official warranty package for express dispatch!`);
+
+            window.open(`mailto:samuelpauljalli@gmail.com,${o.buyerEmail}?subject=New%20SPEK%20Order%20${o.orderId}&body=${mailtoBody}`, '_blank');
+            window.open(`https://wa.me/919182764299?text=${waText}`, '_blank');
+        }
+
+        function downloadInvoicePDF() {
+            if (!lastCreatedOrder) return;
+            const o = lastCreatedOrder;
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            doc.setFillColor(37, 99, 235);
+            doc.rect(0, 0, 210, 35, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(22);
+            doc.setFont('helvetica', 'bold');
+            doc.text("SPEK TECH SUPERSTORE", 14, 20);
+
+            doc.setTextColor(15, 23, 42);
+            doc.setFontSize(10);
+            doc.text(`Order ID: ${o.orderId}`, 14, 45);
+            doc.text(`Date: ${new Date(o.date).toLocaleString('en-IN')}`, 14, 52);
+
+            const tableRows = [[1, currentProduct.name, currentProduct.warranty || "1 Year Official Warranty", detailQty, `Rs. ${currentProduct.price}`, `Rs. ${o.total}`]];
+            doc.autoTable({
+                startY: 65,
+                head: [['#', 'Product', 'Warranty', 'Qty', 'Unit Price', 'Total']],
+                body: tableRows,
+                headStyles: { fillColor: [37, 99, 235] }
+            });
+
+            doc.save(`SPEK_Invoice_${o.orderId}.pdf`);
+        }
+    </script>
+</body>
+</html>

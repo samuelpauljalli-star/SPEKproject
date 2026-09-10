@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice | SPEK Mobile Peripherals</title>
+    <link rel="icon" type="image/svg+xml" href="spek_logo_green_white.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700;800&family=Inter:wght@400;500;600&family=Montserrat:wght@800;900&family=Plus+Jakarta+Sans:wght@600;700;800&family=Space+Grotesk:wght@700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #10b981;
+            --secondary: #0f172a;
+            --text-main: #1e293b;
+            --text-light: #64748b;
+            --bg-light: #f8fafc;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-main);
+            padding: 2rem;
+            display: flex;
+            justify-content: center;
+        }
+
+        .invoice-container {
+            background: white;
+            width: 100%;
+            max-width: 850px;
+            padding: 3rem;
+            border-radius: 16px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e2e8f0;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 1.5rem;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-area img {
+            width: 55px;
+            height: 55px;
+            border-radius: 12px;
+            object-fit: cover;
+        }
+
+        .company-info h1 {
+            color: var(--secondary);
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 900;
+            font-size: 1.6rem;
+            margin-bottom: 4px;
+            letter-spacing: 1px;
+        }
+
+        .company-info h1 span {
+            color: var(--primary);
+        }
+
+        .company-info p {
+            font-size: 0.88rem;
+            color: var(--text-light);
+            line-height: 1.4;
+        }
+
+        .invoice-title {
+            text-align: right;
+        }
+
+        .invoice-title h2 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 800;
+            font-size: 1.8rem;
+            color: var(--secondary);
+            margin-bottom: 5px;
+        }
+
+        .invoice-meta {
+            font-size: 0.88rem;
+            color: var(--text-light);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .billing-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+        }
+
+        .bill-to h3 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1rem;
+            color: var(--secondary);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .bill-to p {
+            font-size: 0.9rem;
+            margin-bottom: 3px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 2rem;
+        }
+
+        th {
+            background: var(--secondary);
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 0.88rem;
+            text-transform: uppercase;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 0.9rem;
+        }
+
+        .total-section {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .total-box {
+            width: 320px;
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+
+        .grand-total {
+            border-top: 2px solid var(--secondary);
+            padding-top: 10px;
+            margin-top: 10px;
+            font-weight: 800;
+            font-size: 1.3rem;
+            font-family: 'Chakra Petch', monospace;
+            color: var(--primary);
+        }
+
+        .actions {
+            margin-top: 3rem;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 10px 25px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .print-btn {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .cancel-btn {
+            background: #fee2e2;
+            color: #ef4444;
+            border: 1px solid #fecaca;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .cancelled {
+            background: #fee2e2;
+            color: #ef4444;
+            border: 1px solid #ef4444;
+            transform: rotate(-5deg);
+        }
+
+        .paid {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #166534;
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+
+            .invoice-container {
+                box-shadow: none;
+                max-width: 100%;
+                padding: 20px;
+            }
+
+            .actions {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="invoice-container" id="invoice">
+        <div style="text-align: center; margin-top: 50px; color: var(--text-light);">Loading Invoice...</div>
+    </div>
+
+    <script>
+        function loadInvoice() {
+            const params = new URLSearchParams(window.location.search);
+            const orderId = params.get('id');
+            const orders = JSON.parse(localStorage.getItem('SPEK-orders')) || [];
+            const order = orders.find(o => o.orderId === orderId);
+            const container = document.getElementById('invoice');
+
+            if (!order) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 3rem;">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #ef4444; margin-bottom: 1rem;"></i>
+                        <h2>Order Not Found</h2>
+                        <p>The requested order details could not be found.</p>
+                        <a href="index.html" style="color: var(--primary); text-decoration: underline; margin-top: 1rem; display: block;">Return to Home</a>
+                    </div>
+                `;
+                return;
+            }
+
+            const isCancelled = order.status === 'Cancelled';
+            const subtotal = order.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const totalTax = order.items.reduce((sum, item) => sum + ((item.price * item.quantity * (item.gst || 0)) / 100), 0);
+
+            container.innerHTML = `
+                <div class="header">
+                    <div class="logo-area">
+                        <div style="width: 52px; height: 52px; border-radius: 12px; background: linear-gradient(135deg, #1e3a8a, #2563eb, #06b6d4); display: flex; align-items: center; justify-content: center; color: #fff; font-family: 'Montserrat', sans-serif; font-size: 1.8rem; font-weight: 900; box-shadow: 0 4px 12px rgba(37,99,235,0.3);">S</div>
+                        <div class="company-info">
+                            <h1><span style="display:inline-flex; align-items:center; justify-content:center; background:linear-gradient(135deg, #2563eb, #06b6d4); color:#fff; width:26px; height:26px; border-radius:6px; font-size:1.1rem; margin-right:2px; vertical-align:middle;">S</span>PEK TECH SUPERSTORE</h1>
+                            <p>Laptops, 160+ Laptop Components, Earbuds & Tech</p>
+                            <p>Hyderabad, Telangana, India</p>
+                            <p>WhatsApp: +91 91827 64299 | Email: samuelpauljalli@gmail.com</p>
+                        </div>
+                    </div>
+                    <div class="invoice-title">
+                        ${isCancelled ? '<div class="status-badge cancelled">CANCELLED</div>' : '<div class="status-badge paid">PAID</div>'}
+                        <h2>ORDER INVOICE</h2>
+                        <div class="invoice-meta">
+                            <p><strong>Order ID:</strong> ${order.orderId}</p>
+                            <p><strong>Date:</strong> ${new Date(order.date).toLocaleDateString()}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="billing-info">
+                    <div class="bill-to">
+                        <h3>BILL TO:</h3>
+                        <p><strong>${order.customer?.name || 'Customer'}</strong></p>
+                        <p>${order.customer?.mobile || ''}</p>
+                        <p>${order.customer?.email || ''}</p>
+                        ${getFormattedAddress(order.customer)}
+                    </div>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Item Description</th>
+                            <th>Qty</th>
+                            <th>Unit Price</th>
+                            <th>Tax (%)</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${order.items.map(item => `
+                            <tr>
+                                <td>${item.name}</td>
+                                <td>${item.quantity}</td>
+                                <td>₹${item.price.toLocaleString('en-IN')}</td>
+                                <td>${item.gst || 0}%</td>
+                                <td>₹${((item.price * item.quantity) + (item.price * item.quantity * (item.gst || 0) / 100)).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+
+                <div class="total-section">
+                    <div class="total-box">
+                        <div class="row">
+                            <span>Subtotal:</span>
+                            <span>₹${subtotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                        </div>
+                        <div class="row">
+                            <span>Total Tax (GST):</span>
+                            <span>₹${totalTax.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                        </div>
+                        <div class="row grand-total">
+                            <span>Grand Total:</span>
+                            <span>₹${(order.total || (subtotal + totalTax)).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <button class="btn print-btn" onclick="window.print()">
+                        <i class="fas fa-print"></i> Print Order
+                    </button>
+                    ${!isCancelled ? `
+                        <button class="btn cancel-btn" onclick="cancelOrderOnInvoice('${orderId}')">
+                            <i class="fas fa-ban"></i> Cancel Order
+                        </button>
+                    ` : ''}
+                    <a href="index.html" class="btn" style="background:#f1f5f9; color: var(--secondary); text-decoration:none;">
+                        <i class="fas fa-home"></i> Back to Home
+                    </a>
+                </div>
+            `;
+        }
+
+        function getFormattedAddress(customer) {
+            if (!customer) return '';
+
+            // Collect address parts
+            const parts = [
+                customer.hno ? `H.No: ${customer.hno}` : '',
+                customer.street,
+                customer.landmark ? `Landmark: ${customer.landmark}` : '',
+                customer.district,
+                customer.state,
+                customer.pincode ? `PIN: ${customer.pincode}` : ''
+            ].filter(Boolean);
+
+            if (parts.length === 0) return '<p style="color:#ef4444; font-size:0.8rem;">(No Address Provided)</p>';
+
+            return `
+                <div style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed #e2e8f0;">
+                    <p style="font-weight:600; color:var(--secondary); margin-bottom:4px;">Delivery Address:</p>
+                    <p style="white-space: pre-wrap; line-height: 1.4;">${parts.join(', ')}</p>
+                </div>
+            `;
+        }
+
+        function cancelOrderOnInvoice(orderId) {
+            if (confirm("Are you sure you want to cancel this order? It will be updated in your history.")) {
+                let orders = JSON.parse(localStorage.getItem('spek-orders')) || [];
+                const index = orders.findIndex(o => o.orderId === orderId);
+                if (index > -1) {
+                    orders[index].status = 'Cancelled';
+                    localStorage.setItem('spek-orders', JSON.stringify(orders));
+                    loadInvoice(); // Reload to show Cancelled status
+                    // Optional: Notify parent if opened in new tab? No need.
+                }
+            }
+        }
+
+        window.onload = loadInvoice;
+
+        // Anti-Inspect Script
+        document.addEventListener('contextmenu', e => e.preventDefault());
+        document.onkeydown = function (e) {
+            if (e.keyCode == 123) return false;
+            if (e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false;
+            if (e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) return false;
+            if (e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) return false;
+            if (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false;
+        };
+    </script>
+</body>
+
+</html>
