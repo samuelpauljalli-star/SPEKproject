@@ -1,4 +1,4 @@
-// Central Firebase Configuration for SPEK Tech Superstore
+// Central Firebase Configuration for SPOKE Tech Superstore
 // Uses Firebase modular JavaScript SDK with ES modules for direct browser integration
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
