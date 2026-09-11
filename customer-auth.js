@@ -1,4 +1,4 @@
-// Customer Authentication & Session Manager for SPEK eCommerce
+// Customer Authentication & Session Manager for SPOKE eCommerce
 // Integrates with centralized AuthService and UserProfileService
 
 import { AuthService, UserProfileService, OrderService, CloudSyncService } from './firebase-service.js';
@@ -35,7 +35,7 @@ export async function signInWithGoogle() {
                 photoURL: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=120&q=80",
                 uid: "usr_" + Date.now()
             };
-            localStorage.setItem('SPEK-user', JSON.stringify(userObj));
+            localStorage.setItem('SPOKE-user', JSON.stringify(userObj));
             currentUser = userObj;
             updateUIForLoggedInUser(currentUser);
             return { success: true, user: currentUser };
