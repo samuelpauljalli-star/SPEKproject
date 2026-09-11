@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SPEK AI Assistant | SPEK Mobile Peripherals</title>
+    <title>SPOKE AI Assistant | SPOKE Mobile Peripherals</title>
     <link rel="icon" type="image/svg+xml" href="spek_logo_green_white.svg">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Space+Grotesk:wght@700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -310,7 +310,7 @@
                 S
             </div>
             <div class="bot-info">
-                <h2><span style="display:inline-flex; align-items:center; justify-content:center; background:#fff; color:#2563eb; width:20px; height:20px; border-radius:5px; font-size:0.85rem; font-weight:900; margin-right:2px;">S</span>PEK AI Assistant</h2>
+                <h2><span style="display:inline-flex; align-items:center; justify-content:center; background:#fff; color:#2563eb; width:20px; height:20px; border-radius:5px; font-size:0.85rem; font-weight:900; margin-right:2px;">S</span>POKE AI Assistant</h2>
                 <span>
                     <div class="status-dot"></div> Online • Laptops & Peripherals
                 </span>
@@ -398,7 +398,7 @@
             let response = "I'm sorry, I didn't quite understand that. Would you like to check our smartphones, laptops, components, earbuds, or chargers?";
 
             if (query.includes('hello') || query.includes('hi')) {
-                response = "Hello! I'm your SPEK Tech Assistant. How can I help you find 5G smartphones, laptops, 160+ laptop components, earbuds, or chargers today?";
+                response = "Hello! I'm your SPOKE Tech Assistant. How can I help you find 5G smartphones, laptops, 160+ laptop components, earbuds, or chargers today?";
             } else if (query.includes('mobile') || query.includes('phone') || query.includes('smartphone') || query.includes('iphone') || query.includes('galaxy') || query.includes('vivo') || query.includes('oneplus') || query.includes('oppo') || query.includes('xiaomi') || query.includes('realme')) {
                 response = "We have 166 verified brand smartphones including iPhone 16 series, Samsung Galaxy S24 Ultra, OnePlus 12, Vivo X100, Xiaomi 14 Ultra, and Pixel 9:";
                 renderProductSuggestions('Smartphones');
@@ -426,7 +426,7 @@
             } else if (query.includes('order')) {
                 response = "To track your order, please check the 'My Orders' section on the main page or provide your Order ID (e.g. SPK-ORD-123456).";
             } else if (query.includes('contact') || query.includes('support')) {
-                response = "You can reach our SPEK support team at samuelpauljalli@gmail.com or WhatsApp us at +91 91827 64299.";
+                response = "You can reach our SPOKE support team at samuelpauljalli@gmail.com or WhatsApp us at +91 91827 64299.";
             } else {
                 // Try searching for products
                 const found = products.filter(p => p.name.toLowerCase().includes(query) || (p.category && p.category.toLowerCase().includes(query)) || (p.brand && p.brand.toLowerCase().includes(query))).slice(0, 3);
@@ -481,7 +481,7 @@
             const typing = showTyping();
             setTimeout(() => {
                 typing.remove();
-                addMessage("👋 Welcome to SPEK Tech Superstore! Looking for laptops, 160+ laptop components & spares, ANC earbuds, studio headsets, GaN fast chargers, or smartwatches? How can I assist you today?", "bot");
+                addMessage("👋 Welcome to SPOKE Tech Superstore! Looking for laptops, 160+ laptop components & spares, ANC earbuds, studio headsets, GaN fast chargers, or smartwatches? How can I assist you today?", "bot");
             }, 800);
         };
     </script>
