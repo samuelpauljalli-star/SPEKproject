@@ -4,10 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Product Details | SPEK Tech Superstore</title>
+    <title>Product Details | SPOKE Tech Superstore</title>
     <link rel="icon" type="image/svg+xml" href="spek_logo_green_white.svg">
     <meta name="theme-color" content="#2563eb">
-    <meta name="description" content="SPEK - Official Brand Certified Laptops, Components, Earbuds, Headsets, Chargers & Smartwatches with 1 Year Official Manufacturer Warranty.">
+    <meta name="description" content="SPOKE - Official Brand Certified Laptops, Components, Earbuds, Headsets, Chargers & Smartwatches with 1 Year Official Manufacturer Warranty.">
     
     <!-- Modern Typography -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -49,7 +49,7 @@
                         uid: 'usr_' + Date.now(),
                         address: ''
                     };
-                    localStorage.setItem('SPEK-user', JSON.stringify(currentUser));
+                    localStorage.setItem('SPOKE-user', JSON.stringify(currentUser));
                     showToast(`Signed in as ${currentUser.email}!`);
                     checkUserStatus();
                     closeModal('login');
@@ -761,7 +761,7 @@
                     <span class="logo-s-emblem">S</span>
                 </div>
                 <div class="logo-text">
-                    <span class="brand-spek"><span class="spek-s-highlight">S</span>PEK</span>
+                    <span class="brand-spek"><span class="spek-s-highlight">S</span>POKE</span>
                     <span class="brand-sub">Laptops • Peripherals • Mobiles</span>
                 </div>
             </a>
@@ -962,7 +962,7 @@
     <script>
         let currentProduct = null;
         let detailQty = 1;
-        let currentUser = JSON.parse(localStorage.getItem('SPEK-user')) || null;
+        let currentUser = JSON.parse(localStorage.getItem('SPOKE-user') || localStorage.getItem('SPEK-user')) || null;
         let collectTimerInterval = null;
         let lastCreatedOrder = null;
 
@@ -994,10 +994,10 @@
         }
 
         function renderProductDetails(p) {
-            document.title = `${p.name} | SPEK Tech Store`;
+            document.title = `${p.name} | SPOKE Tech Store`;
             document.getElementById('bc-category').innerText = p.category || 'Tech Products';
             document.getElementById('bc-name').innerText = p.name;
-            document.getElementById('p-brand').innerText = p.brand || 'SPEK';
+            document.getElementById('p-brand').innerText = p.brand || 'SPOKE';
             document.getElementById('p-discount').innerText = p.discount || '20% OFF';
             document.getElementById('p-name').innerText = p.name;
             document.getElementById('p-ram-storage').innerText = p.compatibleModel || (p.specs && p.specs.Condition) || 'Certified OEM Specification';
@@ -1029,7 +1029,7 @@
             // Specs Table
             const specsTable = document.getElementById('p-specs-table');
             const specs = p.specs || {
-                "Brand": p.brand || "SPEK",
+                "Brand": p.brand || "SPOKE",
                 "Category": p.category,
                 "Model / Part": p.name,
                 "Condition": "Brand New Certified",
@@ -1057,14 +1057,14 @@
 
         function addCurrentToCart() {
             if (!currentProduct) return;
-            let cart = JSON.parse(localStorage.getItem('SPEK-cart')) || [];
+            let cart = JSON.parse(localStorage.getItem('SPOKE-cart') || localStorage.getItem('SPEK-cart')) || [];
             const existing = cart.find(i => i.id === currentProduct.id);
             if (existing) {
                 existing.quantity = (existing.quantity || 1) + detailQty;
             } else {
                 cart.push({ ...currentProduct, quantity: detailQty, cartId: Date.now() });
             }
-            localStorage.setItem('SPEK-cart', JSON.stringify(cart));
+            localStorage.setItem('SPOKE-cart', JSON.stringify(cart));
             alert(`Added ${detailQty}x ${currentProduct.name} to cart!`);
         }
 
@@ -1160,9 +1160,9 @@
             if (collectTimerInterval) clearInterval(collectTimerInterval);
             if (!lastCreatedOrder) return;
 
-            let orders = JSON.parse(localStorage.getItem('SPEK-orders')) || [];
+            let orders = JSON.parse(localStorage.getItem('SPOKE-orders') || localStorage.getItem('SPEK-orders')) || [];
             orders.unshift(lastCreatedOrder);
-            localStorage.setItem('SPEK-orders', JSON.stringify(orders));
+            localStorage.setItem('SPOKE-orders', JSON.stringify(orders));
 
             if (window.saveOrderToFirebase) {
                 window.saveOrderToFirebase(lastCreatedOrder);
@@ -1179,10 +1179,10 @@
             document.getElementById('order-success-modal').classList.add('active');
 
             const o = lastCreatedOrder;
-            const mailtoBody = encodeURIComponent(`New SPEK Order #${o.orderId} Confirmed\n\nBuyer: ${o.buyerName}\nEmail: ${o.buyerEmail}\nMobile: ${o.buyerMobile}\nAddress: ${o.buyerAddress}\n\nPayment Details:\n• Paid via UPI Collect from: ${o.buyerUpiId}\n• Total Amount Paid: ₹${o.total.toLocaleString('en-IN')}\n• Ordered Product: ${currentProduct.name} (Qty: ${detailQty})\n\nStatus: 100% Verified & Paid.`);
-            const waText = encodeURIComponent(`🎉 New SPEK Order #${o.orderId}\n\n• Buyer: ${o.buyerName} (${o.buyerMobile})\n• Total Paid: ₹${o.total.toLocaleString('en-IN')}\n• Paid from UPI: ${o.buyerUpiId}\n• Product: ${currentProduct.name} (Qty: ${detailQty})\n\nPlease prepare official warranty package for express dispatch!`);
+            const mailtoBody = encodeURIComponent(`New SPOKE Order #${o.orderId} Confirmed\n\nBuyer: ${o.buyerName}\nEmail: ${o.buyerEmail}\nMobile: ${o.buyerMobile}\nAddress: ${o.buyerAddress}\n\nPayment Details:\n• Paid via UPI Collect from: ${o.buyerUpiId}\n• Total Amount Paid: ₹${o.total.toLocaleString('en-IN')}\n• Ordered Product: ${currentProduct.name} (Qty: ${detailQty})\n\nStatus: 100% Verified & Paid.`);
+            const waText = encodeURIComponent(`🎉 New SPOKE Order #${o.orderId}\n\n• Buyer: ${o.buyerName} (${o.buyerMobile})\n• Total Paid: ₹${o.total.toLocaleString('en-IN')}\n• Paid from UPI: ${o.buyerUpiId}\n• Product: ${currentProduct.name} (Qty: ${detailQty})\n\nPlease prepare official warranty package for express dispatch!`);
 
-            window.open(`mailto:samuelpauljalli@gmail.com,${o.buyerEmail}?subject=New%20SPEK%20Order%20${o.orderId}&body=${mailtoBody}`, '_blank');
+            window.open(`mailto:samuelpauljalli@gmail.com,${o.buyerEmail}?subject=New%20SPOKE%20Order%20${o.orderId}&body=${mailtoBody}`, '_blank');
             window.open(`https://wa.me/919182764299?text=${waText}`, '_blank');
         }
 
@@ -1197,7 +1197,7 @@
             doc.setTextColor(255, 255, 255);
             doc.setFontSize(22);
             doc.setFont('helvetica', 'bold');
-            doc.text("SPEK TECH SUPERSTORE", 14, 20);
+            doc.text("SPOKE TECH SUPERSTORE", 14, 20);
 
             doc.setTextColor(15, 23, 42);
             doc.setFontSize(10);
@@ -1212,7 +1212,7 @@
                 headStyles: { fillColor: [37, 99, 235] }
             });
 
-            doc.save(`SPEK_Invoice_${o.orderId}.pdf`);
+            doc.save(`SPOKE_Invoice_${o.orderId}.pdf`);
         }
     </script>
 </body>
