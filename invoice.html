@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Invoice | SPEK Mobile Peripherals</title>
+    <title>Invoice | SPOKE Mobile Peripherals</title>
     <link rel="icon" type="image/svg+xml" href="spek_logo_green_white.svg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -245,7 +245,7 @@
         function loadInvoice() {
             const params = new URLSearchParams(window.location.search);
             const orderId = params.get('id');
-            const orders = JSON.parse(localStorage.getItem('SPEK-orders')) || [];
+            const orders = JSON.parse(localStorage.getItem('SPOKE-orders') || localStorage.getItem('SPEK-orders')) || [];
             const order = orders.find(o => o.orderId === orderId);
             const container = document.getElementById('invoice');
 
@@ -377,11 +377,11 @@
 
         function cancelOrderOnInvoice(orderId) {
             if (confirm("Are you sure you want to cancel this order? It will be updated in your history.")) {
-                let orders = JSON.parse(localStorage.getItem('spek-orders')) || [];
+                let orders = JSON.parse(localStorage.getItem('spoke-orders') || localStorage.getItem('spek-orders')) || [];
                 const index = orders.findIndex(o => o.orderId === orderId);
                 if (index > -1) {
                     orders[index].status = 'Cancelled';
-                    localStorage.setItem('spek-orders', JSON.stringify(orders));
+                    localStorage.setItem('spoke-orders', JSON.stringify(orders));
                     loadInvoice(); // Reload to show Cancelled status
                     // Optional: Notify parent if opened in new tab? No need.
                 }
