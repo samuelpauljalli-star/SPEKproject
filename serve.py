@@ -30,7 +30,7 @@ def get_ip():
 local_ip = get_ip()
 
 print("=" * 60)
-print("  SPEK MOBILE PERIPHERAL COMPONENTS ECOMMERCE SERVER")
+print("  SPOKE MOBILE PERIPHERAL COMPONENTS ECOMMERCE SERVER")
 print("=" * 60)
 print(f"  Local Machine:  http://localhost:{PORT}")
 print(f"  Mobile Device:  http://{local_ip}:{PORT}")
