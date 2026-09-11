@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | SPOKE HEALTH CARE</title>
+    <link rel="icon" type="image/jpg" href="spek_logo_green_white.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="data.js"></script>
+    <script type="module" src="firebase-config.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #10b981;
+            --primary-dark: #059669;
+            --secondary: #1e293b;
+            --accent: #f59e0b;
+            --bg-dark: #0f172a;
+            --card-dark: #1e293b;
+            --white: #ffffff;
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+            --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+            background: radial-gradient(circle at top right, rgba(14, 165, 233, 0.15), transparent),
+                radial-gradient(circle at bottom left, rgba(34, 197, 94, 0.1), transparent);
+        }
+
+        /* Login Gate */
+        #login-gate {
+            position: fixed;
+            inset: 0;
+            background: var(--bg-dark);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(20px);
+        }
+
+        .login-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 3rem;
+            border-radius: 30px;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            animation: slideUp 0.8s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .login-logo {
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
+            margin-bottom: 1.5rem;
+            border: 2px solid var(--primary);
+            padding: 5px;
+        }
+
+        .login-card h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(to right, #fff, var(--primary));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .login-card p {
+            color: var(--text-dim);
+            margin-bottom: 2rem;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            margin-bottom: 0.5rem;
+            margin-left: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .input-group input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1rem 1.5rem;
+            border-radius: 15px;
+            color: white;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .input-group input:focus {
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 15px rgba(0, 168, 168, 0.3);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 15px;
+            border: none;
+            background: var(--primary);
+            color: white;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-top: 1rem;
+        }
+
+        .login-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 168, 168, 0.3);
+        }
+
+        .google-btn {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: transparent;
+            color: white;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .google-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Dashboard Main */
+        #dashboard {
+            display: none;
+            width: 100%;
+            height: 100vh;
+            padding: 2rem;
+            gap: 2rem;
+            grid-template-columns: 280px 1fr;
+        }
+
+        /* Sidebar */
+        aside {
+            background: var(--card-dark);
+            border-radius: 30px;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-item {
+            padding: 1rem 1.5rem;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: var(--transition);
+            color: var(--text-dim);
+            font-weight: 500;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: rgba(0, 168, 168, 0.1);
+            color: var(--primary);
+        }
+
+        /* Content Area */
+        main {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        main::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        main::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+        }
+
+        .stat-card {
+            background: var(--card-dark);
+            padding: 1.5rem;
+            border-radius: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .stat-card i {
+            font-size: 1.5rem;
+            color: var(--primary);
+            background: rgba(0, 168, 168, 0.1);
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 15px;
+        }
+
+        .stat-card .val {
+            font-size: 1.8rem;
+            font-weight: 800;
+        }
+
+        .stat-card .label {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+        }
+
+        /* Lists */
+        .data-card {
+            background: var(--card-dark);
+            border-radius: 30px;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .data-card h2 {
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th {
+            color: var(--text-dim);
+            font-weight: 500;
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 0.9rem;
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 0.95rem;
+        }
+
+        .badge-status {
+            padding: 4px 10px;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            background: rgba(0, 168, 168, 0.2);
+            color: var(--primary);
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #ef4444;
+            color: white;
+            padding: 0.8rem 2rem;
+            border-radius: 50px;
+            z-index: 20000;
+            transition: var(--transition);
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Login Gate -->
+    <div id="login-gate">
+        <div class="login-card">
+            <img src="spek_logo_green_white.svg" class="login-logo" alt="SPOKE Logo">
+            <h1>Admin Portal</h1>
+            <p>Enter your credentials to access the secure dashboard.</p>
+
+            <form id="admin-login-form">
+                <div class="input-group">
+                    <label>Admin Code</label>
+                    <input type="text" id="admin-code" placeholder="Enter code" required>
+                </div>
+                <div class="input-group">
+                    <label>Access Key</label>
+                    <input type="password" id="admin-pass" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="login-btn">Secure Login</button>
+            </form>
+
+            <div style="margin: 1.5rem 0; display: flex; align-items: center; gap: 10px; color: var(--text-dim);">
+                <div style="flex: 1; height: 1px; background: rgba(255,255,255,0.1);"></div>
+                <span style="font-size: 0.8rem;">OR</span>
+                <div style="flex: 1; height: 1px; background: rgba(255,255,255,0.1);"></div>
+            </div>
+
+            <button class="google-btn" onclick="adminLoginWithGoogle()">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/pwa_brand/google__72dp.png"
+                    style="width: 20px;">
+                Authenticate with Gmail
+            </button>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dashboard" style="display: none;">
+        <aside>
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 2rem;">
+                <img src="spek_logo_green_white.svg" style="width: 40px; border-radius: 10px;">
+                <span style="font-weight: 800; letter-spacing: 1px;">SPOKE ADMIN</span>
+            </div>
+
+            <div class="nav-item active" onclick="switchTab('overview')">
+                <i class="fas fa-chart-line"></i> Overview
+            </div>
+            <div class="nav-item" onclick="switchTab('orders')">
+                <i class="fas fa-shopping-bag"></i> Orders
+            </div>
+            <div class="nav-item" onclick="switchTab('customers')">
+                <i class="fas fa-users"></i> Customers
+            </div>
+            <div class="nav-item" onclick="switchTab('products')">
+                <i class="fas fa-box"></i> Products
+            </div>
+            <div class="nav-item" onclick="switchTab('settings')">
+                <i class="fas fa-cog"></i> Settings
+            </div>
+
+            <div style="margin-top: auto;">
+                <div class="nav-item" onclick="location.reload()" style="color: #ef4444;">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </div>
+            </div>
+        </aside>
+
+        <main>
+            <!-- Overview Tab -->
+            <div id="tab-overview" class="tab-content">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="val" id="total-orders">0</span>
+                        <span class="label">Total Orders</span>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-wallet"></i>
+                        <span class="val" id="total-revenue">₹0</span>
+                        <span class="label">Revenue</span>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-user-friends"></i>
+                        <span class="val" id="total-users">0</span>
+                        <span class="label">Total Users</span>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-eye"></i>
+                        <span class="val" id="total-visits">0</span>
+                        <span class="label">Page Visits</span>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 2rem;">
+                    <div class="data-card">
+                        <h2>Sales Analytics (Monthly)</h2>
+                        <canvas id="monthlyChart"></canvas>
+                    </div>
+                    <div class="data-card">
+                        <h2>Order Volume (Yearly)</h2>
+                        <canvas id="yearlyChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Orders Tab -->
+            <div id="tab-orders" class="tab-content" style="display: none;">
+                <div class="data-card">
+                    <h2>Orders Management
+                        <div style="display: flex; gap: 10px;">
+                            <button
+                                style="background: #ef4444; border: none; color: white; padding: 5px 15px; border-radius: 10px; font-size: 0.8rem; cursor: pointer;"
+                                onclick="clearData('orders')">Clear Orders</button>
+                            <button
+                                style="background: var(--primary); border: none; color: white; padding: 5px 15px; border-radius: 10px; font-size: 0.8rem; cursor: pointer;"
+                                onclick="exportToExcel()">Export Report</button>
+                        </div>
+                    </h2>
+                    <div style="overflow-x: auto;">
+                        <table id="orders-table">
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Customer & Address</th>
+                                    <th>Date</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="orders-body">
+                                <!-- Orders dynamic -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Customers Tab -->
+            <div id="tab-customers" class="tab-content" style="display: none;">
+                <div class="data-card">
+                    <h2>Customer Management
+                        <div style="display: flex; gap: 10px;">
+                            <input type="text" id="customer-search" placeholder="Search by name, mobile, email..."
+                                style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 5px 15px; border-radius: 10px; color: white; font-size: 0.8rem; width: 250px;"
+                                oninput="filterCustomers()">
+                            <button
+                                style="background: #ef4444; border: none; color: white; padding: 5px 15px; border-radius: 10px; font-size: 0.8rem; cursor: pointer;"
+                                onclick="clearData('users')">Clear Users</button>
+                        </div>
+                    </h2>
+                    <div style="overflow-x: auto;">
+                        <table id="users-table">
+                            <thead>
+                                <tr>
+                                    <th onclick="sortUsers('name')" style="cursor: pointer;">Name <i
+                                            class="fas fa-sort"></i></th>
+                                    <th onclick="sortUsers('mobile')" style="cursor: pointer;">Mobile <i
+                                            class="fas fa-sort"></i></th>
+                                    <th>Email</th>
+                                    <th onclick="sortUsers('lastLogin')" style="cursor: pointer;">Last Login <i
+                                            class="fas fa-sort"></i></th>
+                                    <th>Location</th>
+                                    <th style="text-align:right;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="users-body">
+                                <!-- Users dynamic -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Products Tab -->
+            <div id="tab-products" class="tab-content" style="display: none;">
+                <div class="data-card">
+                    <h2>Inventory Status</h2>
+                    <p style="color: var(--text-dim);">Product management coming soon...</p>
+                </div>
+            </div>
+
+            <!-- Settings Tab -->
+            <div id="tab-settings" class="tab-content" style="display: none;">
+                <div class="data-card">
+                    <h2>Admin Settings</h2>
+                    <div style="display: flex; flex-direction: column; gap: 1rem; margin-top: 1rem;">
+                        <div
+                            style="padding: 1rem; background: rgba(255,255,255,0.02); border-radius: 15px; border: 1px solid rgba(255,255,255,0.05);">
+                            <h4 style="margin-bottom: 0.5rem;">Database Maintenance</h4>
+                            <p style="font-size: 0.85rem; color: var(--text-dim); margin-bottom: 1rem;">Reset all local
+                                storage data for SPOKE HEALTH CARE Application.</p>
+                            <button onclick="localStorage.clear(); location.reload();"
+                                style="background: #ef4444; border: none; color: white; padding: 10px 20px; border-radius: 10px; cursor: pointer; font-weight: 600;">Hard
+                                Reset All Data</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="toast" id="toast">Invalid Credentials</div>
+
+    <!-- Firebase Authentication Script -->
+    <script type="module">
+        import { auth, provider, signInWithPopup, signOut } from './firebase-config.js';
+
+        const AUTHORIZED_EMAILS = ['samuelpauljalli@gmail.com', 'SPOKEhealthcare7@gmail.com'];
+
+        // Google Sign-In
+        window.adminLoginWithGoogle = async function () {
+            try {
+                const result = await signInWithPopup(auth, provider);
+                const user = result.user;
+                const email = user.email.toLowerCase();
+
+                console.log('Signed in user:', email);
+
+                // Check if email is in the authorized list (strict check)
+                if (AUTHORIZED_EMAILS.includes(email)) {
+                    showSuccess(`Welcome Admin, ${user.displayName || email}`);
+                    unlockDashboard(user);
+                } else {
+                    // Sign out unauthorized user immediately
+                    await signOut(auth);
+                    showToast("Access Denied. Only authorized admins can access this dashboard.");
+                }
+            } catch (error) {
+                console.error('Authentication error:', error);
+                showToast(`Authentication Failed: ${error.message}`);
+            }
+        };
+
+        function clearData(type) {
+            if (confirm(`Are you sure you want to clear all ${type}? This cannot be undone.`)) {
+                if (type === 'orders') {
+                    localStorage.removeItem('spoke-orders');
+                    localStorage.removeItem('SPOKE-orders');
+                    localStorage.removeItem('spek-orders');
+                    localStorage.removeItem('SPEK-orders');
+                } else if (type === 'users') {
+                    localStorage.removeItem('spoke-user-history');
+                    localStorage.removeItem('SPOKE-user');
+                    localStorage.removeItem('spek-user-history');
+                    localStorage.removeItem('SPEK-user');
+                }
+                loadDashboardData();
+                showSuccess(`${type} cleared successfully`);
+                setTimeout(() => location.reload(), 500);
+            }
+        }
+
+        function deleteRecord(type, id) {
+            if (confirm(`Are you sure you want to delete this ${type === 'orders' ? 'order' : 'customer'}?`)) {
+                if (type === 'orders') {
+                    let orders = JSON.parse(localStorage.getItem('SPOKE-orders') || localStorage.getItem('spoke-orders') || localStorage.getItem('spek-orders') || localStorage.getItem('SPEK-orders')) || [];
+                    orders = orders.filter(o => o.orderId != id);
+                    localStorage.setItem('SPOKE-orders', JSON.stringify(orders));
+                    localStorage.setItem('spoke-orders', JSON.stringify(orders));
+                } else if (type === 'users') {
+                    let users = JSON.parse(localStorage.getItem('spoke-user-history') || localStorage.getItem('spek-user-history')) || [];
+                    users = users.filter(u => u.email !== id);
+                    localStorage.setItem('spoke-user-history', JSON.stringify(users));
+                }
+                loadDashboardData();
+                showSuccess("Record deleted successfully");
+            }
+        }
+
+        function showSuccess(msg) {
+            showToast(msg, 'success');
+        }
+
+        function showToast(msg, type = 'info') {
+            const toast = document.createElement('div');
+            toast.style = `
+                position: fixed;
+                bottom: 30px;
+                right: 30px;
+                background: ${type === 'success' ? '#10b981' : '#ef4444'};
+                color: white;
+                padding: 1rem 2rem;
+                border-radius: 15px;
+                box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+                z-index: 100000;
+                animation: slideInDash 0.4s ease;
+            `;
+            toast.innerText = msg;
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.style.animation = 'slideOutDash 0.4s ease forwards';
+                setTimeout(() => toast.remove(), 400);
+            }, 3000);
+        }
+
+        // CSS for Toast
+        const toastStyle = document.createElement('style');
+        toastStyle.textContent = `
+            @keyframes slideInDash { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+            @keyframes slideOutDash { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
+        `;
+        document.head.appendChild(toastStyle);
+
+        // Expose to global scope
+        window.clearData = clearData;
+        window.deleteRecord = deleteRecord;
+    </script>
+
+    <script>
+        // Security Deterrents
+        document.addEventListener('contextmenu', e => e.preventDefault());
+        document.onkeydown = function (e) {
+            if (e.keyCode == 123) return false;
+            if (e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false;
+            if (e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) return false;
+            if (e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) return false;
+            if (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false;
+        };
+
+        // Obfuscated logic for credentials
+        const _v1 = "SPOKE";
+        const _v2 = "peter paul";
+
+        document.getElementById('admin-login-form').onsubmit = function (e) {
+            e.preventDefault();
+            const c = document.getElementById('admin-code').value;
+            const p = document.getElementById('admin-pass').value;
+
+            if (c === _v1 && p === _v2) {
+                unlockDashboard();
+            } else {
+                window.location.href = '404_error.html';
+            }
+        };
+
+
+        let salesChart, orderChart;
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+
+            const targetTab = document.getElementById(`tab-${tabId}`);
+            if (targetTab) targetTab.style.display = 'block';
+
+            // Highlight the correct nav item
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(n => {
+                if (n.innerText.toLowerCase().includes(tabId)) {
+                    n.classList.add('active');
+                }
+            });
+
+            if (tabId === 'overview') setTimeout(initCharts, 100);
+        }
+
+        function getEnrichedUsers() {
+            const users = JSON.parse(localStorage.getItem('spoke-user-history') || localStorage.getItem('spek-user-history')) || [];
+            const orders = JSON.parse(localStorage.getItem('SPOKE-orders') || localStorage.getItem('spoke-orders') || localStorage.getItem('spek-orders') || localStorage.getItem('SPEK-orders')) || [];
+
+            return users.map(u => {
+                const userOrders = orders.filter(o => o.customer?.email === u.email);
+                const totalSpent = userOrders.reduce((sum, o) => sum + (o.total || 0), 0);
+                return { ...u, totalSpent, orderCount: userOrders.length };
+            });
+        }
+
+        function filterCustomers() {
+            const query = document.getElementById('customer-search').value.toLowerCase();
+            const enriched = getEnrichedUsers();
+            const filtered = enriched.filter(u =>
+                (u.name || '').toLowerCase().includes(query) ||
+                (u.mobile || '').toLowerCase().includes(query) ||
+                (u.email || '').toLowerCase().includes(query) ||
+                (u.id || '').toLowerCase().includes(query)
+            );
+            renderUsers(filtered);
+        }
+
+        let userSortDir = 1;
+        function sortUsers(key) {
+            const users = getEnrichedUsers();
+            userSortDir *= -1;
+            users.sort((a, b) => {
+                let vA = a[key], vB = b[key];
+                if (key === 'lastLogin') { vA = new Date(vA); vB = new Date(vB); }
+                if (typeof vA === 'string') { vA = vA.toLowerCase(); vB = vB.toLowerCase(); }
+                return vA > vB ? (1 * userSortDir) : (-1 * userSortDir);
+            });
+            renderUsers(users);
+        }
+
+        function renderUsers(usersList) {
+            const usersBody = document.getElementById('users-body');
+            usersBody.innerHTML = usersList.map(u => `
+                <tr>
+                    <td>
+                        <div style="font-weight:600;">${u.name}</div>
+                        <div style="font-size:0.7rem; color:var(--text-dim);">UID: ${u.id || 'N/A'}</div>
+                    </td>
+                    <td>+${u.mobile}</td>
+                    <td>${u.email}</td>
+                    <td>₹${(u.totalSpent || 0).toLocaleString('en-IN')} (${u.orderCount} orders)</td>
+                    <td>${u.lastLogin ? new Date(u.lastLogin).toLocaleString() : 'N/A'}</td>
+                    <td>Hyderabad, IN</td>
+                    <td style="text-align:right;">
+                        <i class="fas fa-trash" style="cursor:pointer; color:#ef4444; font-size: 0.9rem;" onclick="deleteRecord('users', '${u.email}')"></i>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function unlockDashboard(user) {
+            document.getElementById('login-gate').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('login-gate').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'grid';
+                loadDashboardData();
+                initCharts();
+
+                if (user) {
+                    console.log('Admin logged in:', user.displayName, user.email);
+                }
+            }, 500);
+        }
+
+        function loadDashboardData() {
+            const orders = JSON.parse(localStorage.getItem('SPOKE-orders') || localStorage.getItem('spoke-orders') || localStorage.getItem('spek-orders') || localStorage.getItem('SPEK-orders')) || [];
+            const enrichedUsers = getEnrichedUsers();
+
+            document.getElementById('total-orders').innerText = orders.length;
+            const revenue = orders.reduce((sum, o) => sum + (o.total || 0), 0);
+            document.getElementById('total-revenue').innerText = "₹" + revenue.toLocaleString('en-IN');
+            document.getElementById('total-users').innerText = enrichedUsers.length;
+            document.getElementById('total-visits').innerText = Math.floor(Math.random() * 5000) + 1200;
+
+            // Orders Table
+            const ordersBody = document.getElementById('orders-body');
+            if (orders.length === 0) {
+                ordersBody.innerHTML = '<tr><td colspan="6" style="text-align:center; color: var(--text-dim);">No orders found</td></tr>';
+            } else {
+                ordersBody.innerHTML = orders.slice().reverse().map(o => `
+                    <tr>
+                        <td>#${o.orderId}</td>
+                        <td>
+                            <div style="font-weight:600;">${o.customer?.name || 'Guest'}</div>
+                            <div style="font-size:0.75rem; color:var(--text-dim); margin-top:2px;">
+                                ${o.customer?.hno || ''} ${o.customer?.street || ''} <br>
+                                ${o.customer?.district || ''}, ${o.customer?.state || ''} ${o.customer?.pincode || ''}
+                            </div>
+                            <div style="font-size:0.7rem; color:var(--primary);">+${o.customer?.mobile || ''}</div>
+                        </td>
+                        <td>${new Date(o.date).toLocaleDateString()}</td>
+                        <td>₹${(o.total || 0).toLocaleString('en-IN')}</td>
+                        <td><span class="badge-status" style="background: ${o.status === 'Cancelled' ? 'rgba(239, 68, 68, 0.2)' : 'rgba(0, 168, 168, 0.2)'}; color: ${o.status === 'Cancelled' ? '#ef4444' : 'var(--primary)'};">${o.status || 'Placed'}</span></td>
+                        <td>
+                            <a href="invoice.html?id=${o.orderId}" target="_blank" title="View Order Items"><i class="fas fa-file-alt" style="cursor:pointer; color:var(--text-dim); margin-right: 15px;"></i></a>
+                            <i class="fas fa-trash" style="cursor:pointer; color:#ef4444;" onclick="deleteRecord('orders', '${o.orderId}')"></i>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+            renderUsers(enrichedUsers);
+        }
+
+        function initCharts() {
+            const orders = JSON.parse(localStorage.getItem('SPOKE-orders') || localStorage.getItem('spoke-orders') || localStorage.getItem('spek-orders') || localStorage.getItem('SPEK-orders')) || [];
+
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            const monthlySales = new Array(12).fill(0);
+            const monthlyOrders = new Array(12).fill(0);
+
+            orders.forEach(o => {
+                const d = new Date(o.date);
+                if (d.getFullYear() === new Date().getFullYear()) {
+                    monthlySales[d.getMonth()] += o.total || 0;
+                    monthlyOrders[d.getMonth()] += 1;
+                }
+            });
+
+            if (salesChart) salesChart.destroy();
+            if (orderChart) orderChart.destroy();
+
+            const canvas1 = document.getElementById('monthlyChart');
+            const canvas2 = document.getElementById('yearlyChart');
+
+            if (!canvas1 || !canvas2) return;
+
+            const ctx1 = canvas1.getContext('2d');
+            salesChart = new Chart(ctx1, {
+                type: 'line',
+                data: {
+                    labels: months,
+                    datasets: [{
+                        label: 'Revenue (₹)',
+                        data: monthlySales,
+                        borderColor: '#00a8a8',
+                        backgroundColor: 'rgba(0, 168, 168, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { grid: { color: 'rgba(255,255,255,0.05)', display: false }, ticks: { color: '#94a3b8' } },
+                        x: { ticks: { color: '#94a3b8' } }
+                    }
+                }
+            });
+
+            const ctx2 = canvas2.getContext('2d');
+            orderChart = new Chart(ctx2, {
+                type: 'bar',
+                data: {
+                    labels: months,
+                    datasets: [{
+                        label: 'Orders',
+                        data: monthlyOrders,
+                        backgroundColor: '#f59e0b',
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { grid: { color: 'rgba(255,255,255,0.05)', display: false }, ticks: { color: '#94a3b8' } },
+                        x: { ticks: { color: '#94a3b8' } }
+                    }
+                }
+            });
+        }
+
+        function exportToExcel() {
+            alert("Generating daily report for SPOKE Health Care...");
+            // Real export logic would use a library like SheetJS
+        }
+    </script>
+
+</body>
+
+</html>
