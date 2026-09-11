@@ -4,10 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SPEK - Official Laptops, Components & Peripherals Superstore</title>
+    <title>SPOKE - Official Laptops, Components & Peripherals Superstore</title>
     <link rel="icon" type="image/svg+xml" href="spek_logo_green_white.svg">
     <meta name="theme-color" content="#2563eb">
-    <meta name="description" content="SPEK - India's #1 Superstore for Laptops, 160+ Laptop Components & Spares, Buds, Headsets, Fast Chargers, Smartwatches & Smartphones with Pan-India Express Delivery.">
+    <meta name="description" content="SPOKE - India's #1 Superstore for Laptops, 160+ Laptop Components & Spares, Buds, Headsets, Fast Chargers, Smartwatches & Smartphones with Pan-India Express Delivery.">
     
     <!-- Modern Typography -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -50,7 +50,7 @@
                         uid: 'usr_' + Date.now(),
                         address: ''
                     };
-                    localStorage.setItem('SPEK-user', JSON.stringify(currentUser));
+                    localStorage.setItem('SPOKE-user', JSON.stringify(currentUser));
                     showToast(`Signed in as ${currentUser.email}!`);
                     checkUserStatus();
                     closeModal('login');
@@ -1497,7 +1497,7 @@
                     <span class="logo-s-emblem">S</span>
                 </div>
                 <div class="logo-text">
-                    <span class="brand-spek"><span class="spek-s-highlight">S</span>PEK</span>
+                    <span class="brand-spek"><span class="spek-s-highlight">S</span>POKE</span>
                     <span class="brand-sub">Laptops • Peripherals • Mobiles</span>
                 </div>
             </a>
@@ -1628,7 +1628,7 @@
         <div class="modal-overlay" id="cart-modal">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h2><i class="fas fa-shopping-bag" style="color: var(--primary);"></i> Your SPEK Cart</h2>
+                    <h2><i class="fas fa-shopping-bag" style="color: var(--primary);"></i> Your SPOKE Cart</h2>
                     <button class="close-btn" onclick="closeModal('cart')">&times;</button>
                 </div>
                 <div class="modal-body">
@@ -1767,7 +1767,7 @@
                                 <i class="fas fa-list-check" style="color: var(--primary);"></i> How to Complete Payment on your Phone:
                             </div>
                             <div style="margin-bottom: 4px;">1. Open <strong id="collect-app-name">Google Pay / PhonePe / Paytm</strong> on your mobile.</div>
-                            <div style="margin-bottom: 4px;">2. Tap on the pending payment collect notification from <strong>SPEK Superstore</strong>.</div>
+                            <div style="margin-bottom: 4px;">2. Tap on the pending payment collect notification from <strong>SPOKE Superstore</strong>.</div>
                             <div>3. Enter your secure <strong>UPI PIN</strong> to approve the transfer.</div>
                         </div>
 
@@ -1895,12 +1895,12 @@
                                 <span class="logo-s-emblem">S</span>
                             </div>
                             <div class="logo-text">
-                                <span class="brand-spek"><span class="spek-s-highlight">S</span>PEK</span>
+                                <span class="brand-spek"><span class="spek-s-highlight">S</span>POKE</span>
                                 <span class="brand-sub">Laptops • Peripherals • Mobiles</span>
                             </div>
                         </a>
                         <p style="color: var(--text-muted); font-size: 0.84rem; line-height: 1.6; max-width: 380px;">
-                            SPEK is India's dedicated technology portal for flagship laptops, 160+ certified laptop components & spares, TWS earbuds, studio headsets, GaN fast power solutions, smartwatches and smartphones with official warranty.
+                            SPOKE is India's dedicated technology portal for flagship laptops, 160+ certified laptop components & spares, TWS earbuds, studio headsets, GaN fast power solutions, smartwatches and smartphones with official warranty.
                         </p>
                     </div>
 
@@ -1946,7 +1946,7 @@
                 </div>
 
                 <div class="footer-bottom">
-                    <div>&copy; 2026 SPEK TECH SUPERSTORE. All Rights Reserved.</div>
+                    <div>&copy; 2026 SPOKE TECH SUPERSTORE. All Rights Reserved.</div>
                     <div style="display: flex; gap: 14px;">
                         <span>100% Brand Sealed Packs</span>
                         <span>•</span>
@@ -1963,10 +1963,10 @@
     <script>
         // Store State
         let storeCatalog = (typeof products !== 'undefined') ? products : [];
-        let cart = JSON.parse(localStorage.getItem('SPEK-cart')) || [];
-        let wishlist = JSON.parse(localStorage.getItem('SPEK-wishlist')) || [];
-        let orders = JSON.parse(localStorage.getItem('SPEK-orders')) || [];
-        let currentUser = JSON.parse(localStorage.getItem('SPEK-user')) || null;
+        let cart = JSON.parse(localStorage.getItem('SPOKE-cart') || localStorage.getItem('SPEK-cart')) || [];
+        let wishlist = JSON.parse(localStorage.getItem('SPOKE-wishlist') || localStorage.getItem('SPEK-wishlist')) || [];
+        let orders = JSON.parse(localStorage.getItem('SPOKE-orders') || localStorage.getItem('SPEK-orders')) || [];
+        let currentUser = JSON.parse(localStorage.getItem('SPOKE-user') || localStorage.getItem('SPEK-user')) || null;
 
         let currentBrand = 'All';
         let currentCategory = 'All';
@@ -2251,7 +2251,7 @@
 
                         <div class="product-card-body">
                             <div class="product-chips-row">
-                                <span class="chip-brand">${p.brand || 'SPEK'}</span>
+                                <span class="chip-brand">${p.brand || 'SPOKE'}</span>
                                 <span class="chip-tag">${p.tag || p.subcategory || p.category}</span>
                             </div>
 
@@ -2526,7 +2526,7 @@
 
             // 1. Save to Local Orders
             orders.unshift(lastCreatedOrder);
-            localStorage.setItem('SPEK-orders', JSON.stringify(orders));
+            localStorage.setItem('SPOKE-orders', JSON.stringify(orders));
 
             // 2. Sync to Firebase Firestore
             if (window.saveOrderToFirebase) {
@@ -2541,8 +2541,8 @@
             // 4. Trigger Notifications to Admin
             const o = lastCreatedOrder;
             const orderSummary = o.items.map(i => `• ${i.name} (Qty: ${i.quantity}) - ₹${(i.price * i.quantity).toLocaleString('en-IN')}`).join('\n');
-            const mailtoBody = encodeURIComponent(`New SPEK Order #${o.orderId} Confirmed\n\nBuyer: ${o.buyerName}\nEmail: ${o.buyerEmail}\nMobile: ${o.buyerMobile}\nAddress: ${o.buyerAddress}\n\nPayment Details:\n• Paid via UPI Collect from: ${o.buyerUpiId}\n• App: ${o.selectedApp}\n• Total Amount Transferred: ₹${o.total.toLocaleString('en-IN')}\n\nOrdered Product(s):\n${orderSummary}\n\nStatus: 100% Verified & Paid.`);
-            const waText = encodeURIComponent(`🎉 *New SPEK Order #${o.orderId}*\n\n• Buyer: ${o.buyerName} (${o.buyerMobile})\n• Address: ${o.buyerAddress}\n• Total Paid: ₹${o.total.toLocaleString('en-IN')}\n• Paid from UPI: ${o.buyerUpiId} (${o.selectedApp})\n• Items: ${o.items.map(i => i.name + ' x' + i.quantity).join(', ')}\n\nPlease prepare official warranty package for express dispatch!`);
+            const mailtoBody = encodeURIComponent(`New SPOKE Order #${o.orderId} Confirmed\n\nBuyer: ${o.buyerName}\nEmail: ${o.buyerEmail}\nMobile: ${o.buyerMobile}\nAddress: ${o.buyerAddress}\n\nPayment Details:\n• Paid via UPI Collect from: ${o.buyerUpiId}\n• App: ${o.selectedApp}\n• Total Amount Transferred: ₹${o.total.toLocaleString('en-IN')}\n\nOrdered Product(s):\n${orderSummary}\n\nStatus: 100% Verified & Paid.`);
+            const waText = encodeURIComponent(`🎉 *New SPOKE Order #${o.orderId}*\n\n• Buyer: ${o.buyerName} (${o.buyerMobile})\n• Address: ${o.buyerAddress}\n• Total Paid: ₹${o.total.toLocaleString('en-IN')}\n• Paid from UPI: ${o.buyerUpiId} (${o.selectedApp})\n• Items: ${o.items.map(i => i.name + ' x' + i.quantity).join(', ')}\n\nPlease prepare official warranty package for express dispatch!`);
 
             // 5. Trigger Confetti
             try {
@@ -2560,7 +2560,7 @@
             openModal('order-success');
 
             // Auto dispatch admin email & whatsapp in background
-            const mailtoLink = `mailto:samuelpauljalli@gmail.com,${o.buyerEmail}?subject=New%20SPEK%20Order%20${o.orderId}&body=${mailtoBody}`;
+            const mailtoLink = `mailto:samuelpauljalli@gmail.com,${o.buyerEmail}?subject=New%20SPOKE%20Order%20${o.orderId}&body=${mailtoBody}`;
             window.open(mailtoLink, '_blank');
             window.open(`https://wa.me/919182764299?text=${waText}`, '_blank');
         }
@@ -2578,7 +2578,7 @@
             doc.setTextColor(255, 255, 255);
             doc.setFontSize(22);
             doc.setFont('helvetica', 'bold');
-            doc.text("SPEK TECH SUPERSTORE", 14, 20);
+            doc.text("SPOKE TECH SUPERSTORE", 14, 20);
             doc.setFontSize(10);
             doc.setFont('helvetica', 'normal');
             doc.text("Official Tax Invoice / Warranty Receipt", 14, 28);
@@ -2626,7 +2626,7 @@
             doc.text("Terms: 100% Brand Sealed Pack with Official Manufacturer Warranty. Prices include 18% GST.", 14, finalY + 8);
             doc.text("Admin Support: samuelpauljalli@gmail.com | WhatsApp: +91 91827 64299", 14, finalY + 14);
 
-            doc.save(`SPEK_Invoice_${o.orderId}.pdf`);
+            doc.save(`SPOKE_Invoice_${o.orderId}.pdf`);
             showToast("Invoice downloaded successfully!");
         }
 
@@ -2640,7 +2640,7 @@
                 wishlist.push(id);
                 showToast("Added to wishlist!");
             }
-            localStorage.setItem('SPEK-wishlist', JSON.stringify(wishlist));
+            localStorage.setItem('SPOKE-wishlist', JSON.stringify(wishlist));
             updateStats();
             applyFilters();
         }
@@ -2714,8 +2714,8 @@
 
         // Stats & Badges
         function updateStats() {
-            localStorage.setItem('SPEK-cart', JSON.stringify(cart));
-            localStorage.setItem('SPEK-wishlist', JSON.stringify(wishlist));
+            localStorage.setItem('SPOKE-cart', JSON.stringify(cart));
+            localStorage.setItem('SPOKE-wishlist', JSON.stringify(wishlist));
 
             const totalCartItems = cart.reduce((sum, i) => sum + (i.quantity || 1), 0);
             document.getElementById('cart-badge').innerText = totalCartItems;
@@ -2761,7 +2761,7 @@
                 profilePic: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=120&q=80',
                 address: ''
             };
-            localStorage.setItem('SPEK-user', JSON.stringify(currentUser));
+            localStorage.setItem('SPOKE-user', JSON.stringify(currentUser));
             showToast(`Signed in as ${input}!`);
             checkUserStatus();
             closeModal('login');
